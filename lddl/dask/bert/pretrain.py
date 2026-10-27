@@ -43,7 +43,7 @@ from lddl.utils import (expand_outdir_and_mkdir, attach_bool_arg,
                         serialize_np_array, deserialize_np_array)
 from lddl.download.utils import parse_str_of_num_bytes
 
-from .binning import to_textfiles_binned, to_dataframe_binned, to_parquet_binned
+from .binning import to_textfiles_binned, to_parquet_binned
 
 
 class Sentence:
@@ -99,16 +99,18 @@ def _get_documents(bag_texts, tokenizer, max_length=512):
 
 def _shuffle_bag_texts(bag_texts):
 
-  return bag_texts.map(lambda text: {
-      'text': text,
-      'on': random.random(),
-  }).to_dataframe(meta={
-      'text': str,
-      'on': float,
-  }).shuffle(
-      'on',
-      ignore_index=True,
-  ).sample(frac=1.0).to_bag().map(lambda t: t[0])
+  # P2P shuffle actually fails on the 'bag -> dataframe -> bag' part; Using the 'tasks'-shuffle instead.
+  with dask.config.set({'dataframe.shuffle.method': 'tasks'}):
+    return bag_texts.map(lambda text: {
+        'text': text,
+        'on': random.random(),
+    }).to_dataframe(meta={
+        'text': str,
+        'on': float,
+    }).shuffle(
+        'on',
+        ignore_index=True,
+    ).sample(frac=1.0).to_bag().map(lambda t: t[0])
 
 
 def _cut(lcut, tokens, rcut):
@@ -478,19 +480,11 @@ def _save_parquet(
     )
   else:
     nbins = target_seq_length // bin_size
-    pairs.to_dataframe = to_dataframe_binned
-    dfs = pairs.to_dataframe(
-        pairs,
-        meta=base_meta,
-        bin_size=bin_size,
-        nbins=nbins,
-    )
     to_parquet_binned(
-        dfs,
+        pairs,
         path,
+        bin_size,
         nbins,
-        engine='pyarrow',
-        write_index=False,
         schema={
             **base_schema,
             'bin_id': pa.int64(),
