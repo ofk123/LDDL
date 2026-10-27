@@ -607,6 +607,7 @@ def main(args):
       masking=args.masking,
   )
   print('Running the dask pipeline took {} s'.format(time.perf_counter() - tic))
+  client.close()
 
 
 def attach_args(parser=argparse.ArgumentParser("""

@@ -182,6 +182,7 @@ def main(args):
   args.sink = expand_outdir_and_mkdir(args.sink)
   save(sequences, args.sink, output_format=args.output_format)
   print('Running the dask pipeline took {} s'.format(time.perf_counter() - tic))
+  client.close()
 
 
 def attach_args(
