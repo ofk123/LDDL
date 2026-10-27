@@ -33,7 +33,8 @@ import pyarrow as pa
 import time
 
 from lddl.dask.readers import (read_open_webtext, read_wikipedia, read_books,
-                               read_common_crawl, estimate_block_size)
+                               read_common_crawl, estimate_block_size,
+                               split_id_text)
 from lddl.utils import expand_outdir_and_mkdir
 from lddl.download.utils import parse_str_of_num_bytes
 
@@ -127,7 +128,8 @@ def _get_sequences(wikipedia_path=None,
       })
     return results
 
-  def _generate_sequences(article):
+  def _generate_sequences(raw_text):
+    _, article = split_id_text(raw_text)
     return _aggregate_sentences(_segment(article))
 
   return db.concat(bags).map(_generate_sequences).flatten()
