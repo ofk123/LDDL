@@ -1,0 +1,16 @@
+#
+# I did:
+# pip install -r requirements.txt
+# pip install --no-deps .
+dask==2026.8.0
+distributed==2026.8.0
+bokeh==3.9.2
+pandas==2.3.3
+numpy==2.5.4
+pyarrow==25.0.0
+requests==2.34.2
+fsspec==2026.9.0
+nltk==3.10.4
+transformers==5.21.0
+tokenizers==0.23.3
+huggingface-hub==2.3.0

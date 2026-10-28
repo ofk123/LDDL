@@ -1,5 +1,5 @@
 # pakcages needed that pangeo/pangeo-notebook:2026.10.21 lacks. 
-# I insstall it with --no-deps so that nothing in the image ends up changed.
+# I insstall it with --no-deps so that nothing in the image is changed.
 #
 # I used:
 # pip install --no-deps -r requirements-hub.txt
